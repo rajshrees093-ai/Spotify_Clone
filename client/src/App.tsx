@@ -10,6 +10,7 @@ import { QueuePanel } from './components/QueuePanel';
 import { FullscreenPlayer } from './components/FullscreenPlayer';
 import { PlaylistModal } from './components/PlaylistModal';
 import { AuthModal } from './components/AuthModal';
+import { UploadSongModal } from './components/UploadSongModal';
 
 import { HomePage } from './pages/HomePage';
 import { SearchPage } from './pages/SearchPage';
@@ -33,6 +34,7 @@ const ScrollToTop = () => {
 export const AppContent: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const initializeFromDatabase = useLibraryStore((s) => s.initializeFromDatabase);
 
   useEffect(() => {
@@ -49,6 +51,7 @@ export const AppContent: React.FC = () => {
         <Sidebar
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onOpenUpload={() => setIsUploadModalOpen(true)}
         />
 
         {/* Center Main Stage */}
@@ -88,6 +91,7 @@ export const AppContent: React.FC = () => {
       {/* Modals & Fullscreen Player */}
       <FullscreenPlayer />
       <PlaylistModal />
+      <UploadSongModal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );

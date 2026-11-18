@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -13,6 +16,14 @@ import {
   getPlaylistsWithSongs,
   getDatabaseStats,
 } from './db.js';
+import { fetchOfficialPreview, isOfficialOrLocalAudio } from './previewResolver.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const UPLOADS_DIR = path.resolve(__dirname, '../uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
 
 dotenv.config();
 
@@ -24,8 +35,9 @@ const PORT = process.env.PORT || 5000;
 const DEFAULT_USER_ID = 'usr-demo-1';
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
 app.use(morgan('dev'));
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 // Health & Database Stats
 app.get('/api/health', (req, res) => {
@@ -133,6 +145,90 @@ app.get('/api/songs/:id', (req, res) => {
   const row = db.prepare('SELECT * FROM songs WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'Song not found' });
   res.json(formatSong(row));
+});
+
+// Resolve & cache official vocal preview URL for any song on demand
+app.get('/api/songs/:id/audio', async (req, res) => {
+  try {
+    const row = db.prepare('SELECT * FROM songs WHERE id = ?').get(req.params.id);
+    if (!row) return res.status(404).json({ error: 'Song not found' });
+
+    if (isOfficialOrLocalAudio(row.audio_url)) {
+      return res.json({
+        audioUrl: row.audio_url,
+        coverUrl: row.cover_url,
+        source: row.audio_url.startsWith('/uploads/') ? 'upload' : 'official_preview',
+      });
+    }
+
+    const match = await fetchOfficialPreview(row.title, row.artist);
+    if (match && match.previewUrl) {
+      db.prepare('UPDATE songs SET audio_url = ?, cover_url = COALESCE(?, cover_url) WHERE id = ?').run(
+        match.previewUrl,
+        match.artworkUrl || row.cover_url,
+        row.id
+      );
+      return res.json({
+        audioUrl: match.previewUrl,
+        coverUrl: match.artworkUrl || row.cover_url,
+        source: 'official_preview',
+      });
+    }
+
+    res.json({
+      audioUrl: row.audio_url,
+      coverUrl: row.cover_url,
+      source: 'fallback',
+    });
+  } catch (err) {
+    console.error('[API /songs/:id/audio error]', err);
+    res.status(500).json({ error: 'Failed to resolve audio stream' });
+  }
+});
+
+// Upload personal full-length audio file (.mp3, .wav, .m4a, .ogg) into local storage + SQLite
+app.post('/api/upload', (req, res) => {
+  try {
+    const { title, artist, album, genre, duration, lyrics, coverUrl, fileName, audioBase64 } = req.body;
+    if (!title || !audioBase64) {
+      return res.status(400).json({ error: 'Song title and audio file are required' });
+    }
+
+    const cleanBase64 = audioBase64.includes(',') ? audioBase64.split(',')[1] : audioBase64;
+    const ext = path.extname(fileName || '.mp3').replace(/[^a-zA-Z0-9.]/g, '') || '.mp3';
+    const safeName = `track-${Date.now()}-${Math.random().toString(36).slice(2, 7)}${ext}`;
+    const destPath = path.join(UPLOADS_DIR, safeName);
+
+    fs.writeFileSync(destPath, Buffer.from(cleanBase64, 'base64'));
+
+    const songId = `song-up-${Date.now()}`;
+    const audioUrl = `/uploads/${safeName}`;
+    const cover =
+      coverUrl ||
+      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80';
+
+    db.prepare(`
+      INSERT INTO songs (id, title, artist, artist_id, album, album_id, duration, audio_url, cover_url, lyrics, genre, plays_count, added_at)
+      VALUES (?, ?, ?, 'art-9', ?, 'alb-7', ?, ?, ?, ?, ?, 1, ?)
+    `).run(
+      songId,
+      title.trim(),
+      (artist || 'Personal Upload').trim(),
+      (album || 'My Uploads').trim(),
+      Number(duration || 180),
+      audioUrl,
+      cover,
+      lyrics || '',
+      genre || 'Bollywood',
+      new Date().toISOString()
+    );
+
+    const inserted = db.prepare('SELECT * FROM songs WHERE id = ?').get(songId);
+    res.status(201).json({ song: formatSong(inserted), stats: getDatabaseStats() });
+  } catch (err) {
+    console.error('[API POST /upload error]', err);
+    res.status(500).json({ error: 'Failed to upload audio file' });
+  }
 });
 
 // ==================== ARTISTS ====================

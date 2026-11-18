@@ -22,11 +22,25 @@ import { usePlayerStore } from '../stores/usePlayerStore';
 import { useLibraryStore } from '../stores/useLibraryStore';
 import { formatDuration } from '../utils/formatters';
 import { audioSynthesizer } from '../utils/audioSynthesizer';
+import { api } from '../services/api';
+
+function isVocalOrLocalUrl(url?: string): boolean {
+  if (!url) return false;
+  return (
+    url.includes('itunes.apple.com') ||
+    url.startsWith('/uploads/') ||
+    url.startsWith('http://localhost') ||
+    url.startsWith('blob:')
+  );
+}
 
 export const MusicPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const loadedSongIdRef = useRef<string | null>(null);
   const [isAudioLoaded, setIsAudioLoaded] = useState(false);
+  const [isResolvingAudio, setIsResolvingAudio] = useState(false);
   const [usingSynthesizer, setUsingSynthesizer] = useState(false);
+  const [resolvedUrl, setResolvedUrl] = useState<string>('');
 
   const {
     currentSong,
@@ -60,7 +74,14 @@ export const MusicPlayer: React.FC = () => {
     playbackError,
   } = usePlayerStore();
 
-  const { isSongLiked, toggleLikeSong, userPlaylists, addSongToPlaylist } = useLibraryStore();
+  const {
+    songs,
+    isSongLiked,
+    toggleLikeSong,
+    userPlaylists,
+    addSongToPlaylist,
+    updateSongAudioUrl,
+  } = useLibraryStore();
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
 
   // Keyboard shortcuts (Space, Arrow keys)
@@ -91,36 +112,78 @@ export const MusicPlayer: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlay, seek, setVolume, currentTime, duration, volume]);
 
-  // Handle Play/Pause and source change
+  // Resolve official vocal stream or uploaded audio whenever currentSong changes
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentSong) return;
 
-    if (audio.src !== currentSong.audioUrl) {
-      audio.src = currentSong.audioUrl;
-      audio.load();
-      setUsingSynthesizer(false);
-      setPlaybackError(null);
-    }
+    let cancelled = false;
 
-    if (isPlaying) {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('[Audio Player] Native stream playback blocked or errored, falling back to Web Audio Synthesizer:', err);
-          // Seamless Web Audio Synthesizer fallback
-          setUsingSynthesizer(true);
-          audioSynthesizer.setVolume(isMuted ? 0 : volume);
-          audioSynthesizer.start(currentSong.id, currentSong.genre);
-        });
+    const loadAndPlay = async () => {
+      // Always prefer the hydrated version from library store (loaded from SQLite DB)
+      const dbSong = songs.find((s) => s.id === currentSong.id);
+      let targetUrl = dbSong?.audioUrl || currentSong.audioUrl;
+
+      // If still pointing to an instrumental demo placeholder, fetch real vocal audio
+      if (!isVocalOrLocalUrl(targetUrl)) {
+        setIsResolvingAudio(true);
+        try {
+          const res = await api.resolveSongAudio(currentSong.id);
+          if (res?.audioUrl && isVocalOrLocalUrl(res.audioUrl)) {
+            targetUrl = res.audioUrl;
+            updateSongAudioUrl(currentSong.id, targetUrl);
+          }
+        } catch {
+          // Backend unreachable -> resolve directly via public iTunes Search API
+          const directUrl = await api.fetchDirectPreview(currentSong.title, currentSong.artist);
+          if (directUrl) {
+            targetUrl = directUrl;
+            updateSongAudioUrl(currentSong.id, targetUrl);
+          }
+        } finally {
+          if (!cancelled) setIsResolvingAudio(false);
+        }
       }
-    } else {
-      audio.pause();
-      if (usingSynthesizer) {
+
+      if (cancelled) return;
+
+      const isNewTrack = loadedSongIdRef.current !== currentSong.id || resolvedUrl !== targetUrl;
+      if (isNewTrack) {
+        audioSynthesizer.stop();
+        setUsingSynthesizer(false);
+        setPlaybackError(null);
+        setResolvedUrl(targetUrl);
+        loadedSongIdRef.current = currentSong.id;
+        audio.src = targetUrl;
+        audio.load();
+      }
+
+      if (isPlaying) {
+        audioSynthesizer.stop();
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            if (cancelled) return;
+            // Ignore benign AbortError when rapidly switching songs
+            if (err?.name === 'AbortError') return;
+            console.warn('[Audio Player] Playback interrupted, falling back to synthesizer:', err);
+            setUsingSynthesizer(true);
+            audioSynthesizer.setVolume(isMuted ? 0 : volume);
+            audioSynthesizer.start(currentSong.id, currentSong.genre);
+          });
+        }
+      } else {
+        audio.pause();
         audioSynthesizer.stop();
       }
-    }
-  }, [currentSong, isPlaying]);
+    };
+
+    loadAndPlay();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentSong, isPlaying, songs]);
 
   // Handle Volume changes
   useEffect(() => {
@@ -229,14 +292,32 @@ export const MusicPlayer: React.FC = () => {
             >
               {currentSong.title}
             </p>
-            {usingSynthesizer && (
+            {isResolvingAudio ? (
+              <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 shrink-0 animate-pulse">
+                Loading
+              </span>
+            ) : usingSynthesizer ? (
+              <span
+                className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 shrink-0"
+                title="Offline synthesizer fallback active"
+              >
+                Synth
+              </span>
+            ) : resolvedUrl.startsWith('/uploads/') || resolvedUrl.startsWith('blob:') ? (
+              <span
+                className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-300 shrink-0"
+                title="Full uploaded audio file"
+              >
+                Full Track
+              </span>
+            ) : resolvedUrl.includes('itunes.apple.com') ? (
               <span
                 className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-spotify-green/20 text-spotify-green shrink-0"
-                title="Synthesizer engine active"
+                title="Official licensed vocal audio preview"
               >
-                HQ Synth
+                Vocal Preview
               </span>
-            )}
+            ) : null}
           </div>
           <p
             onClick={toggleRightPanel}

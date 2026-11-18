@@ -11,7 +11,8 @@ import {
   Radio,
   FolderPlus,
   ListFilter,
-  CheckCircle2
+  CheckCircle2,
+  Upload
 } from 'lucide-react';
 import { useLibraryStore } from '../stores/useLibraryStore';
 import { usePlayerStore } from '../stores/usePlayerStore';
@@ -20,9 +21,10 @@ import { BrandLogo } from './BrandLogo';
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onOpenUpload?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onOpenUpload }) => {
   const navigate = useNavigate();
   const { artists, albums, userPlaylists, likedSongIds, followedArtistIds, setCreatePlaylistModalOpen } = useLibraryStore();
   const { currentSong, isPlaying } = usePlayerStore();
@@ -95,6 +97,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
             <Compass size={20} />
             {!isCollapsed && <span>Discover</span>}
           </NavLink>
+
+          {onOpenUpload && (
+            <button
+              onClick={onOpenUpload}
+              className="flex items-center gap-4 px-3 py-2.5 rounded-xl font-bold text-sm transition-all text-spotify-subtext hover:text-white hover:bg-white/5 border border-transparent text-left"
+              title="Upload your own full-length MP3/WAV song"
+            >
+              <Upload size={20} className="text-spotify-green" />
+              {!isCollapsed && <span>Upload Song</span>}
+            </button>
+          )}
         </nav>
       </div>
 

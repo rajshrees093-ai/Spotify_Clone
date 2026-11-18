@@ -154,4 +154,47 @@ export const api = {
       body: JSON.stringify({ email, username }),
     });
   },
+
+  resolveSongAudio(songId: string) {
+    return request<{ audioUrl: string; coverUrl?: string; source: 'upload' | 'official_preview' | 'fallback' }>(
+      `/songs/${encodeURIComponent(songId)}/audio`
+    );
+  },
+
+  async fetchDirectPreview(title: string, artist: string): Promise<string | null> {
+    const cleanTitle = title.replace(/\(.*?\)|\[.*?\]/g, '').trim();
+    const primaryArtist = artist.split(',')[0].replace(/\(.*?\)/g, '').trim();
+    const query = `${cleanTitle} ${primaryArtist}`.trim();
+    for (const country of ['IN', 'US']) {
+      try {
+        const res = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=3&country=${country}`
+        );
+        if (!res.ok) continue;
+        const data = await res.json();
+        const match = data.results?.find((r: { previewUrl?: string }) => Boolean(r.previewUrl));
+        if (match?.previewUrl) return match.previewUrl;
+      } catch {
+        // try next country
+      }
+    }
+    return null;
+  },
+
+  uploadSong(payload: {
+    title: string;
+    artist: string;
+    album?: string;
+    genre: string;
+    duration?: number;
+    lyrics?: string;
+    coverUrl?: string;
+    fileName: string;
+    audioBase64: string;
+  }) {
+    return request<{ song: Song; stats: DatabaseStats }>('/upload', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
 };

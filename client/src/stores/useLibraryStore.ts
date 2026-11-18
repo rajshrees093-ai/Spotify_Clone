@@ -40,6 +40,8 @@ interface LibraryStore {
   addSongToPlaylist: (playlistId: string, song: Song) => void;
   removeSongFromPlaylist: (playlistId: string, songId: string) => void;
   recordPlayHistory: (song: Song) => void;
+  addUploadedSong: (song: Song, stats?: DatabaseStats) => void;
+  updateSongAudioUrl: (songId: string, audioUrl: string) => void;
 
   setSearchQuery: (query: string) => void;
   setCreatePlaylistModalOpen: (open: boolean) => void;
@@ -423,6 +425,23 @@ export const useLibraryStore = create<LibraryStore>((set, get) => ({
         set({ dbStats: res.stats, isDbConnected: true });
       })
       .catch(() => {});
+  },
+
+  addUploadedSong: (song: Song, stats?: DatabaseStats) => {
+    set((state) => ({
+      songs: [song, ...state.songs],
+      dbStats: stats || state.dbStats,
+    }));
+  },
+
+  updateSongAudioUrl: (songId: string, audioUrl: string) => {
+    set((state) => ({
+      songs: state.songs.map((s) => (s.id === songId ? { ...s, audioUrl } : s)),
+      userPlaylists: state.userPlaylists.map((pl) => ({
+        ...pl,
+        songs: pl.songs.map((s) => (s.id === songId ? { ...s, audioUrl } : s)),
+      })),
+    }));
   },
 
   setSearchQuery: (query: string) => set({ searchQuery: query }),
