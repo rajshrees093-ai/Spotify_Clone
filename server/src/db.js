@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DB_DIR = path.resolve(__dirname, '../database');
-export const DB_PATH = path.join(DB_DIR, 'spotify.db');
+export const DB_PATH = path.join(DB_DIR, 'pulsewave.db');
 
 if (!fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });

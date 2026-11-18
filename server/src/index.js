@@ -31,7 +31,7 @@ app.use(morgan('dev'));
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'spotify-clone-api',
+    service: 'pulsewave-api',
     database: {
       engine: 'sqlite',
       path: DB_PATH,
@@ -86,7 +86,7 @@ app.get('/api/bootstrap', (req, res) => {
 
     res.json({
       database: {
-        engine: 'SQLite (spotify.db)',
+        engine: 'SQLite (pulsewave.db)',
         connected: true,
         stats: getDatabaseStats(),
       },
@@ -543,7 +543,7 @@ app.put('/api/users/:id', (req, res) => {
 
 app.listen(PORT, () => {
   const stats = getDatabaseStats();
-  console.log(`[Spotify API] Server running on http://localhost:${PORT}`);
+  console.log(`[PulseWave API] Server running on http://localhost:${PORT}`);
   console.log(
     `[SQLite DB] Connected to ${DB_PATH} (${stats.songs} songs, ${stats.artists} artists, ${stats.albums} albums, ${stats.playlists} playlists)`
   );

@@ -173,7 +173,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               ) : (
                 <p className="text-spotify-subtext text-[11px] leading-relaxed">
                   Start the backend API (<code className="text-white">npm run server</code>) to sync live with{' '}
-                  <code className="text-spotify-green">spotify.db</code>.
+                  <code className="text-spotify-green">pulsewave.db</code>.
                 </p>
               )}
 

@@ -77,7 +77,7 @@ const getInitialUser = (): UserProfile | null => {
       ? JSON.parse(saved)
       : {
           id: 'usr-demo-1',
-          email: 'alex.sound@spotify.com',
+          email: 'alex.sound@pulsewave.app',
           username: 'Alex Parker',
           fullName: 'Alex Parker',
           avatarUrl:
@@ -124,7 +124,7 @@ export const useLibraryStore = create<LibraryStore>((set, get) => ({
         recentHistory: data.recentHistory || [],
         user: currentUser || data.user,
         isDbConnected: Boolean(data.database?.connected),
-        dbEngine: data.database?.engine || 'SQLite (spotify.db)',
+        dbEngine: data.database?.engine || 'SQLite (pulsewave.db)',
         dbStats: data.database?.stats || null,
         isLoadingCatalog: false,
       });
