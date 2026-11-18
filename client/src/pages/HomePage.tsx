@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pause } from 'lucide-react';
 import { usePlayerStore } from '../stores/usePlayerStore';
@@ -12,22 +12,36 @@ export const HomePage: React.FC = () => {
   const greeting = getGreeting();
   const { currentSong, isPlaying, playSong, togglePlay } = usePlayerStore();
   const { songs, artists, albums, userPlaylists, recentHistory } = useLibraryStore();
+  const [regionalTab, setRegionalTab] = useState<'Bollywood' | 'Hindi' | 'Punjabi' | 'Bhojpuri'>('Bollywood');
 
   const recentlyPlayedSongs = recentHistory.length > 0 ? recentHistory.slice(0, 6) : songs.slice(0, 6);
+  const regionalSongs = songs.filter((s) => s.genre === regionalTab);
 
-  // Top 6 Recently Played quick-access grid
+  // Top 6 Quick Access Grid
   const quickItems = [
     {
-      id: 'pl-office',
-      title: 'Office',
-      cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80',
-      action: () => navigate('/playlist/pl-office'),
+      id: 'pl-bollywood',
+      title: 'Bollywood Blockbusters',
+      cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80',
+      action: () => navigate('/playlist/pl-bollywood'),
     },
     {
-      id: 'pl-no-new-friends',
-      title: 'No New Friends EP',
-      cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=300&q=80',
-      action: () => navigate('/playlist/pl-no-new-friends'),
+      id: 'pl-punjabi',
+      title: 'Punjabi Bangers',
+      cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=300&q=80',
+      action: () => navigate('/playlist/pl-punjabi'),
+    },
+    {
+      id: 'pl-hindi',
+      title: 'Hindi Soul & Sufi',
+      cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=300&q=80',
+      action: () => navigate('/playlist/pl-hindi'),
+    },
+    {
+      id: 'pl-bhojpuri',
+      title: 'Bhojpuri Dhamaka',
+      cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=300&q=80',
+      action: () => navigate('/playlist/pl-bhojpuri'),
     },
     {
       id: 'liked',
@@ -36,22 +50,10 @@ export const HomePage: React.FC = () => {
       action: () => navigate('/playlist/liked'),
     },
     {
-      id: 'pl-daily-mix-1',
-      title: 'Daily Mix 1',
-      cover: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=300&q=80',
-      action: () => navigate('/playlist/pl-daily-mix-1'),
-    },
-    {
-      id: 'alb-2',
-      title: 'RENAISSANCE',
-      cover: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=300&q=80',
-      action: () => navigate('/album/alb-2'),
-    },
-    {
-      id: 'alb-3',
-      title: 'After Hours',
-      cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80',
-      action: () => navigate('/album/alb-3'),
+      id: 'pl-office',
+      title: 'Office',
+      cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80',
+      action: () => navigate('/playlist/pl-office'),
     },
   ];
 
@@ -98,6 +100,42 @@ export const HomePage: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Desi Spotlight: Bollywood, Hindi, Punjabi & Bhojpuri */}
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-spotify-green">
+              Desi Spotlight
+            </span>
+            <h2 className="text-xl md:text-2xl font-bold text-white">
+              Bollywood, Hindi, Punjabi & Bhojpuri Hits
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {(['Bollywood', 'Hindi', 'Punjabi', 'Bhojpuri'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setRegionalTab(tab)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  regionalTab === tab
+                    ? 'bg-gradient-to-r from-[#10D9A0] to-[#38BDF8] text-[#061214] shadow-md shadow-teal-500/20'
+                    : 'bg-spotify-card text-spotify-subtext hover:text-white border border-white/[0.06]'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {regionalSongs.map((song) => (
+            <MusicCard key={song.id} item={song} type="song" />
+          ))}
+        </div>
+      </section>
 
       {/* Section 1: Recently Played */}
       <section>
