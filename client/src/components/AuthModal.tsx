@@ -69,7 +69,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleDemoLogin = () => {
     setUser({
       id: 'usr-demo-1',
-      email: 'alex.sound@pulsewave.app',
+      email: 'alex@syren.audio',
       username: 'Alex Parker',
       fullName: 'Alex Parker',
       avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
@@ -94,8 +94,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <div className="mb-3">
             <BrandLogo size="lg" showText={false} />
           </div>
-          <h2 className="text-2xl font-black text-white tracking-tight">
-            {isSignUp ? 'Join PulseWave' : 'Log in to PulseWave'}
+          <h2
+            className="text-2xl font-black text-white tracking-wider"
+            style={{ fontFamily: "'Syne', 'Plus Jakarta Sans', sans-serif" }}
+          >
+            {isSignUp ? 'JOIN SYRĒN' : 'ENTER SYRĒN'}
           </h2>
           <p className="text-xs text-spotify-subtext mt-1">
             {isSupabaseConfigured
@@ -219,7 +222,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 }}
                 className="text-white underline font-semibold hover:text-spotify-green"
               >
-                Sign up for PulseWave
+                Sign up for SYRĒN
               </button>
             </p>
           )}

@@ -56,15 +56,18 @@ export const HomePage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-full pb-28 px-6 md:px-8 pt-6 space-y-10 bg-[radial-gradient(ellipse_at_top_left,_rgba(16,217,160,0.12),_transparent_45%)]">
+    <div className="min-h-full pb-28 px-6 md:px-8 pt-6 space-y-10 bg-[radial-gradient(ellipse_at_top_left,_rgba(16,217,160,0.14),_transparent_42%),radial-gradient(ellipse_at_top_right,_rgba(232,121,249,0.08),_transparent_45%)]">
       {/* Top Greeting */}
       <div>
         <div className="flex items-end justify-between mb-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-spotify-green mb-1">
-              PulseWave Studio
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.28em] bg-gradient-to-r from-[#10D9A0] via-[#38BDF8] to-[#E879F9] bg-clip-text text-transparent mb-1">
+              SYRĒN • HI-FI SOUND
             </p>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            <h1
+              className="text-3xl md:text-4xl font-extrabold text-white tracking-tight"
+              style={{ fontFamily: "'Syne', 'Plus Jakarta Sans', sans-serif" }}
+            >
               {greeting}
             </h1>
           </div>

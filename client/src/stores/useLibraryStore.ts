@@ -46,11 +46,11 @@ interface LibraryStore {
   setEditingPlaylist: (playlist: Playlist | null) => void;
 }
 
-const STORAGE_KEY_LIKES = 'pulsewave_liked_songs';
-const STORAGE_KEY_PLAYLISTS = 'pulsewave_user_playlists';
-const STORAGE_KEY_ALBUMS = 'pulsewave_saved_albums';
-const STORAGE_KEY_ARTISTS = 'pulsewave_followed_artists';
-const STORAGE_KEY_USER = 'pulsewave_user';
+const STORAGE_KEY_LIKES = 'syren_liked_songs';
+const STORAGE_KEY_PLAYLISTS = 'syren_user_playlists';
+const STORAGE_KEY_ALBUMS = 'syren_saved_albums';
+const STORAGE_KEY_ARTISTS = 'syren_followed_artists';
+const STORAGE_KEY_USER = 'syren_user';
 
 const getInitialLikes = (): string[] => {
   try {
@@ -77,7 +77,7 @@ const getInitialUser = (): UserProfile | null => {
       ? JSON.parse(saved)
       : {
           id: 'usr-demo-1',
-          email: 'alex.sound@pulsewave.app',
+          email: 'alex@syren.audio',
           username: 'Alex Parker',
           fullName: 'Alex Parker',
           avatarUrl:
@@ -124,7 +124,7 @@ export const useLibraryStore = create<LibraryStore>((set, get) => ({
         recentHistory: data.recentHistory || [],
         user: currentUser || data.user,
         isDbConnected: Boolean(data.database?.connected),
-        dbEngine: data.database?.engine || 'SQLite (pulsewave.db)',
+        dbEngine: data.database?.engine || 'SQLite (syren.db)',
         dbStats: data.database?.stats || null,
         isLoadingCatalog: false,
       });

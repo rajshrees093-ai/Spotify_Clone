@@ -13,7 +13,7 @@ export const NowPlayingPanel: React.FC = () => {
   const artist = artists.find((a) => a.id === currentSong.artistId) || {
     id: currentSong.artistId,
     name: currentSong.artist,
-    bio: `${currentSong.artist} is an acclaimed musical artist on PulseWave.`,
+    bio: `${currentSong.artist} is an acclaimed musical artist on SYRĒN.`,
     imageUrl: currentSong.coverUrl,
     bannerUrl: currentSong.coverUrl,
     monthlyListeners: 45200000,

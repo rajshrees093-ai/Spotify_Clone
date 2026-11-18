@@ -173,7 +173,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               ) : (
                 <p className="text-spotify-subtext text-[11px] leading-relaxed">
                   Start the backend API (<code className="text-white">npm run server</code>) to sync live with{' '}
-                  <code className="text-spotify-green">pulsewave.db</code>.
+                  <code className="text-spotify-green">syren.db</code>.
                 </p>
               )}
 
@@ -191,14 +191,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
 
         <button
           onClick={() => navigate('/browse')}
-          className="hidden md:flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full bg-gradient-to-r from-[#10D9A0] to-[#22D3EE] text-[#061214] hover:brightness-110 hover:scale-105 transition-all shadow-md shadow-teal-500/20"
+          className="hidden md:flex items-center gap-1.5 text-xs font-extrabold tracking-wider px-4 py-1.5 rounded-full bg-gradient-to-r from-[#10D9A0] via-[#38BDF8] to-[#E879F9] text-[#061214] hover:brightness-110 hover:scale-105 transition-all shadow-md shadow-cyan-500/25"
         >
           <Sparkles size={14} />
-          <span>PulseWave Plus</span>
+          <span>SYRĒN+</span>
         </button>
 
         <button
-          onClick={() => alert('PulseWave Web App can be installed directly from your browser address bar!')}
+          onClick={() => alert('SYRĒN Web App can be installed directly from your browser address bar!')}
           className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full text-spotify-subtext hover:text-white hover:bg-white/10 transition-colors"
         >
           <Download size={15} />

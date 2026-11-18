@@ -843,12 +843,12 @@ export const DEMO_PLAYLISTS: Playlist[] = [
   {
     id: 'pl-daily-mix-1',
     title: 'Daily Mix 1',
-    description: 'By PulseWave • Dream on Dreamer, Arctic Monkeys, The Weeknd and more. Made for you, refreshed daily.',
+    description: 'By SYRĒN • Dream on Dreamer, Arctic Monkeys, The Weeknd and more. Made for you, refreshed daily.',
     coverUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
@@ -870,8 +870,8 @@ export const DEMO_PLAYLISTS: Playlist[] = [
     coverUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
@@ -894,8 +894,8 @@ export const DEMO_PLAYLISTS: Playlist[] = [
     coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
@@ -918,8 +918,8 @@ export const DEMO_PLAYLISTS: Playlist[] = [
     coverUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
@@ -941,8 +941,8 @@ export const DEMO_PLAYLISTS: Playlist[] = [
     coverUrl: 'https://images.unsplash.com/photo-1511735111819-9a3f7709049c?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
@@ -964,8 +964,8 @@ export const DEMO_PLAYLISTS: Playlist[] = [
     coverUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
@@ -987,8 +987,8 @@ export const DEMO_PLAYLISTS: Playlist[] = [
     coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
     isPublic: true,
     creator: {
-      id: 'pulsewave',
-      name: 'PulseWave',
+      id: 'syren',
+      name: 'SYRĒN',
       avatarUrl: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=120&q=80'
     },
     songs: [
