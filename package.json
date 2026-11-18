@@ -1,0 +1,13 @@
+{
+  "name": "spotify-clone",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix client run dev",
+    "dev:all": "concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev"
+  }
+}
